@@ -7,19 +7,20 @@ var selectWell = function(wellName){
 // find the cycle where the Linear Phase starts
 var findLinearPhaseStart = function(wellName){
   var wellData = selectWell(wellName);
-  var firstCycleChange = wellData[1].fluorescence - wellData[0].fluorescence;
-  var secondCycleChange = wellData[2].fluorescence - wellData[1].fluorescence;
-
-  var previousCycleChange = firstCycleChange;
+  var previousCycleChange = wellData[1].fluorescence - wellData[0].fluorescence;
   var linearPhaseStartCycle = 0;
-  // iterate through the cycles
+  
+  // iterate through the cycles starting on cycleTwo
   for(var i = 1; i < wellData.length; i++){
     var currentCycleChange = wellData[i].fluorescence - wellData[i - 1].fluorescence
     
+    //update linearPhaseStartCycle to be the last cycle where there was in increase in delta fluorescence
     if(currentCycleChange > previousCycleChange){
       // this is not i+1 because I want the cycle before the last time this statement is true
       linearPhaseStartCycle = i;
-    } else if(currentCycleChange < previousCycleChange){
+      // the > 2 check handles a bug where fluorescences of 0, 0, 1, 1 would tag the 0-1 border as the linear phase
+    } else if(currentCycleChange < previousCycleChange && wellData[i].fluorescence > 2){
+      // when the delta fluorescence starts dropping, return the linearPhaseStartCycle
       return linearPhaseStartCycle;
     }
     // update the previousCycleChange
@@ -36,8 +37,8 @@ var findLinearPhaseEnd = function(wellName){
   // iterate through the cycles
   for(var i = 1; i < wellData.length; i++){
     var currentCycleChange = wellData[i].fluorescence - wellData[i - 1].fluorescence
-
-    if(currentCycleChange < previousCycleChange){
+    //return the cycle where the slope starts decreasing for the first time
+    if(currentCycleChange < previousCycleChange && wellData[i].fluorescence > 2){
       // this is not i+1 because I want the cycle before the last time this statement is true
       return i;
     }
@@ -59,7 +60,7 @@ var linearPhaseRange = function(wellName){
   return range;
 }
 
-// print out the change in fluorescence per cycle during the linear phase
+// return the change in fluorescence per cycle during the linear phase
 var linearPhaseSlope = function(wellName){
   var wellData = selectWell(wellName);
   var phaseStart = findLinearPhaseStart(wellName);
@@ -119,41 +120,45 @@ var addHeaders = function(){
   }
 }
 
+// this doesn't really need to be it's own function but it helps keep the code organised
+  // I could also alter this to make smaller tables pretty easily
+var populateTable = function(){
+  var rowFirstDigit = '0';
+  var rowSecondDigit = '|';
+  // add the data
+  for(var well in data){
+    // add a header for each row
+    // this will not work for datasets with differently formatted names
+      // but it makes the table easier to use
+    if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
+      rowFirstDigit = well[4]
+      rowSecondDigit = well[5]
+      addHeaders();
+    } 
+    var linearRange = linearPhaseRange(well);
+    $('#overviewTable').append('<tr id=' + well + '></tr>');
+    // add the wellName value as a button linked to a chart-generating function
+    $(document.getElementById(well))
+      .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
+    
 
-var rowFirstDigit = '0';
-var rowSecondDigit = '|';
-// add the data
-for(var well in data){
-  // add a header for each row
-  // this will not work for datasets with differently formatted names
-    // but it makes the table easier to use
-  if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
-    rowFirstDigit = well[4]
-    rowSecondDigit = well[5]
-    addHeaders();
-  } 
-  var linearRange = linearPhaseRange(well);
-  $('#overviewTable').append('<tr id=' + well + '></tr>');
-  // add the wellName value as a button linked to a chart-generating function
-  $(document.getElementById(well))
-    .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
-  
-
-  data[well].forEach(function(cycle){
-    // if the cycle is in the linear range or at the max fluorescence value give it a special id
-    if(linearRange.includes(cycle.cycle)){
-      $(document.getElementById(well))
-        .append('<td class=linearRange >' + cycle.fluorescence + '</td>')
-    } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
-      $(document.getElementById(well))
-        .append('<td class=plateau >' + cycle.fluorescence + '</td>')
-    } else {
-      $(document.getElementById(well))
-        .append('<td>' + cycle.fluorescence + '</td>')
-    }
-  });
+    data[well].forEach(function(cycle){
+      // if the cycle is in the linear range or at the min/max fluorescence value give it a special id
+      if(linearRange.includes(cycle.cycle)){
+        $(document.getElementById(well))
+          .append('<td class=linearRange >' + cycle.fluorescence + '</td>')
+      } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
+        $(document.getElementById(well))
+          .append('<td class=plateau >' + cycle.fluorescence + '</td>')
+      } else {
+        $(document.getElementById(well))
+          .append('<td>' + cycle.fluorescence + '</td>')
+      }
+    });
+  }
 }
 
+populateTable();
 
 var drawIndividualChart = function(element){
   var wellName = element.id;
@@ -169,26 +174,3 @@ var drawIndividualChart = function(element){
 
   chart.render();
 }
-
-
-
-
-
-// var table = d3.select('body').append('table');
-
-// for(var well in data){
-
-//   var tr = table.selectAll('tr')
-//       .data(data[well]).enter()
-//       .append('tr');
-
-//   tr.append('th')
-//       .attr('class', 'cycle')
-//       .html(function(m) { return "cycle: " + m.cycle; }); 
-
-   
-//   tr.append('td')
-//       .attr('class', 'fluorescence')
-//       .html(function(m) { return m.fluorescence; });
- 
-// }
