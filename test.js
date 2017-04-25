@@ -72,38 +72,29 @@ var linearPhaseSlope = function(wellName){
 }
 
 
-//formatt the data for use in the overview chart
-var overviewData = function(){
-  var reformattedData = [];
-
-  for(var well in data){
-    var dataPoints = [];
-    data[well].forEach(function(cycle){
-      dataPoints.push({x: cycle.cycle, y: cycle.fluorescence});
-    });
-    reformattedData.push({
-      type: "line", 
-      toolTipContent: "{well}  cycle: {x}, fluorescence: {y}",
-      dataPoints: dataPoints
-    });
-  }
-
-  return reformattedData;
-}
-
 //formatt the data for use in the solo chart
 var wellData = function(wellName){
-  var reformattedData = [];
   var dataPoints = [];
 
   data[wellName].forEach(function(cycle){
     dataPoints.push({x: cycle.cycle, y: cycle.fluorescence});
   });
-  reformattedData.push({
+  var result = {
     type: "line", 
     toolTipContent: "{well}  cycle: {x}, fluorescence: {y}",
     dataPoints: dataPoints
-  });  
+  };  
+
+  return result;
+}
+
+//formatt the data for use in the overview chart
+var overviewData = function(){
+  var reformattedData = [];
+
+  for(var well in data){
+    reformattedData.push(wellData(well));
+  }
 
   return reformattedData;
 }
@@ -169,7 +160,7 @@ var drawIndividualChart = function(element){
     title:{
     text: "qPCR Solo Chart for " + wellName  
     },
-    data: wellData(wellName)
+    data: [wellData(wellName)]
   });
 
   chart.render();
