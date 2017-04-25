@@ -91,41 +91,67 @@ var overviewData = function(){
 }
 
 
+// generate the overview table with jquery
+var addHeaders = function(){
+  // add the well header
+  $('#overviewTable').append('<th>Well</th>');
+
+  // add the cycle headers
+  for(var i = 1; i <= 40; i++){
+    $('#overviewTable').append('<th>cycle: ' + i + '</th>');
+  }
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var table = d3.select('body').append('table');
-
+var rowFirstDigit = '0';
+var rowSecondDigit = '|';
+// add the data
 for(var well in data){
+  // add a header for each row
+  // this will not work for datasets with differently formatted names
+    // but it makes the table easier to use
+  if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
+    rowFirstDigit = well[4]
+    rowSecondDigit = well[5]
+    addHeaders();
+  } 
+  var linearRange = linearPhaseRange(well);
+  $('#overviewTable').append('<tr id=' + well + '></tr>');
+  $(document.getElementById(well)).append('<td>' + well + '</td>');
+  data[well].forEach(function(cycle){
+    // if the cycle is in the linear range or at the max fluorescence value give it a special id
+    if(linearRange.includes(cycle.cycle)){
+      $(document.getElementById(well)).append('<td class=linearRange >' + cycle.fluorescence + '</td>')
+    } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
+      $(document.getElementById(well)).append('<td class=plateau >' + cycle.fluorescence + '</td>')
+    } else {
+      $(document.getElementById(well)).append('<td>' + cycle.fluorescence + '</td>')
+    }
+  });
+}
 
-  var tr = table.selectAll('tr')
-      .data(data[well]).enter()
-      .append('tr');
 
 
-  tr.append('th')
-      .attr('class', 'cycle')
-      .html(function(m) { return m.cycle; }); 
+
+
+
+
+
+// var table = d3.select('body').append('table');
+
+// for(var well in data){
+
+//   var tr = table.selectAll('tr')
+//       .data(data[well]).enter()
+//       .append('tr');
+
+//   tr.append('th')
+//       .attr('class', 'cycle')
+//       .html(function(m) { return "cycle: " + m.cycle; }); 
 
    
-  tr.append('td')
-      .attr('class', 'fluorescence')
-      .html(function(m) { return m.fluorescence; });
+//   tr.append('td')
+//       .attr('class', 'fluorescence')
+//       .html(function(m) { return m.fluorescence; });
  
-}
+// }
