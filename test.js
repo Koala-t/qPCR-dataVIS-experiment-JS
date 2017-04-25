@@ -91,41 +91,43 @@ var overviewData = function(){
 }
 
 
+// generate the overview table with jquery
+$('#overviewTable').append('<th>Well</th>');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var table = d3.select('body').append('table');
+for(var i = 1; i <= 40; i++){
+  $('#overviewTable').append('<th>cycle: ' + i + '</th>');
+}
 
 for(var well in data){
+  $('#overviewTable').append('<tr id=' + well + '></tr>');
+  $(document.getElementById(well)).append('<td>' + well + '</td>');
+  data[well].forEach(function(cycle){
+    $(document.getElementById(well)).append('<td>' + cycle.fluorescence + '</td>')
+  });
+}
 
-  var tr = table.selectAll('tr')
-      .data(data[well]).enter()
-      .append('tr');
 
 
-  tr.append('th')
-      .attr('class', 'cycle')
-      .html(function(m) { return m.cycle; }); 
+
+
+
+
+
+// var table = d3.select('body').append('table');
+
+// for(var well in data){
+
+//   var tr = table.selectAll('tr')
+//       .data(data[well]).enter()
+//       .append('tr');
+
+//   tr.append('th')
+//       .attr('class', 'cycle')
+//       .html(function(m) { return "cycle: " + m.cycle; }); 
 
    
-  tr.append('td')
-      .attr('class', 'fluorescence')
-      .html(function(m) { return m.fluorescence; });
+//   tr.append('td')
+//       .attr('class', 'fluorescence')
+//       .html(function(m) { return m.fluorescence; });
  
-}
+// }
