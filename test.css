@@ -1,3 +1,11 @@
+table, th {
+  border: 2px solid black;
+}
+
+td {
+  border: 1px solid gray;
+}
+
 .linearRange {
   background-color: green;
 }
