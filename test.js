@@ -102,8 +102,6 @@ var addHeaders = function(){
   }
 }
 
-addHeaders();
-
 
 var rowFirstDigit = '0';
 var rowSecondDigit = '|';
