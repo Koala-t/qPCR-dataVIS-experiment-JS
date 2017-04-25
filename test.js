@@ -94,8 +94,6 @@ var overviewData = function(){
 var wellData = function(wellName){
   var reformattedData = [];
   var dataPoints = [];
-  console.log(wellName)
-  console.log(data.wellName);
 
   data[wellName].forEach(function(cycle){
     dataPoints.push({x: cycle.cycle, y: cycle.fluorescence});
@@ -138,7 +136,7 @@ for(var well in data){
   $('#overviewTable').append('<tr id=' + well + '></tr>');
   // add the wellName value as a button linked to a chart-generating function
   $(document.getElementById(well))
-    .append('<td><button onclick="drawIndividualChart(this)">' + well + '</button></td>');
+    .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
   
 
   data[well].forEach(function(cycle){
@@ -158,13 +156,13 @@ for(var well in data){
 
 
 var drawIndividualChart = function(element){
-  var wellName = $(element)[0].firstChild;
+  var wellName = element.id;
 
   var chart = new CanvasJS.Chart("soloChartContainer",
   {
     zoomEnabled: true,
     title:{
-    text: "qPCR Solo Chart"  
+    text: "qPCR Solo Chart for " + wellName  
     },
     data: wellData(wellName)
   });
