@@ -92,16 +92,31 @@ var overviewData = function(){
 
 
 // generate the overview table with jquery
-// add the well header
-$('#overviewTable').append('<th>Well</th>');
+var addHeaders = function(){
+  // add the well header
+  $('#overviewTable').append('<th>Well</th>');
 
-// add the cycle headers
-for(var i = 1; i <= 40; i++){
-  $('#overviewTable').append('<th>cycle: ' + i + '</th>');
+  // add the cycle headers
+  for(var i = 1; i <= 40; i++){
+    $('#overviewTable').append('<th>cycle: ' + i + '</th>');
+  }
 }
 
+addHeaders();
+
+
+var rowFirstDigit = '0';
+var rowSecondDigit = '|';
 // add the data
 for(var well in data){
+  // add a header for each row
+  // this will not work for datasets with differently formatted names
+    // but it makes the table easier to use
+  if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
+    rowFirstDigit = well[4]
+    rowSecondDigit = well[5]
+    addHeaders();
+  } 
   var linearRange = linearPhaseRange(well);
   $('#overviewTable').append('<tr id=' + well + '></tr>');
   $(document.getElementById(well)).append('<td>' + well + '</td>');
