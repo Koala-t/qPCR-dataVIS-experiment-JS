@@ -18,7 +18,8 @@ var findLinearPhaseStart = function(wellName){
     if(currentCycleChange > previousCycleChange){
       // this is not i+1 because I want the cycle before the last time this statement is true
       linearPhaseStartCycle = i;
-    } else if(currentCycleChange < previousCycleChange){
+      // the > 2 check handles a bug where fluorescences of 0, 0, 1, 1 would tag the 0-1 border as the linear phase
+    } else if(currentCycleChange < previousCycleChange && wellData[i].fluorescence > 2){
       // when the delta fluorescence starts dropping, return the linearPhaseStartCycle
       return linearPhaseStartCycle;
     }
@@ -36,8 +37,8 @@ var findLinearPhaseEnd = function(wellName){
   // iterate through the cycles
   for(var i = 1; i < wellData.length; i++){
     var currentCycleChange = wellData[i].fluorescence - wellData[i - 1].fluorescence
-
-    if(currentCycleChange < previousCycleChange){
+    //return the cycle where the slope starts decreasing for the first time
+    if(currentCycleChange < previousCycleChange && wellData[i].fluorescence > 2){
       // this is not i+1 because I want the cycle before the last time this statement is true
       return i;
     }
@@ -59,7 +60,7 @@ var linearPhaseRange = function(wellName){
   return range;
 }
 
-// print out the change in fluorescence per cycle during the linear phase
+// return the change in fluorescence per cycle during the linear phase
 var linearPhaseSlope = function(wellName){
   var wellData = selectWell(wellName);
   var phaseStart = findLinearPhaseStart(wellName);
