@@ -120,41 +120,45 @@ var addHeaders = function(){
   }
 }
 
+// this doesn't really need to be it's own function but it helps keep the code organised
+  // I could also alter this to make smaller tables pretty easily
+var populateTable = function(){
+  var rowFirstDigit = '0';
+  var rowSecondDigit = '|';
+  // add the data
+  for(var well in data){
+    // add a header for each row
+    // this will not work for datasets with differently formatted names
+      // but it makes the table easier to use
+    if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
+      rowFirstDigit = well[4]
+      rowSecondDigit = well[5]
+      addHeaders();
+    } 
+    var linearRange = linearPhaseRange(well);
+    $('#overviewTable').append('<tr id=' + well + '></tr>');
+    // add the wellName value as a button linked to a chart-generating function
+    $(document.getElementById(well))
+      .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
+    
 
-var rowFirstDigit = '0';
-var rowSecondDigit = '|';
-// add the data
-for(var well in data){
-  // add a header for each row
-  // this will not work for datasets with differently formatted names
-    // but it makes the table easier to use
-  if(rowFirstDigit !== well[4] || rowSecondDigit !== well[5]){
-    rowFirstDigit = well[4]
-    rowSecondDigit = well[5]
-    addHeaders();
-  } 
-  var linearRange = linearPhaseRange(well);
-  $('#overviewTable').append('<tr id=' + well + '></tr>');
-  // add the wellName value as a button linked to a chart-generating function
-  $(document.getElementById(well))
-    .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
-  
-
-  data[well].forEach(function(cycle){
-    // if the cycle is in the linear range or at the max fluorescence value give it a special id
-    if(linearRange.includes(cycle.cycle)){
-      $(document.getElementById(well))
-        .append('<td class=linearRange >' + cycle.fluorescence + '</td>')
-    } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
-      $(document.getElementById(well))
-        .append('<td class=plateau >' + cycle.fluorescence + '</td>')
-    } else {
-      $(document.getElementById(well))
-        .append('<td>' + cycle.fluorescence + '</td>')
-    }
-  });
+    data[well].forEach(function(cycle){
+      // if the cycle is in the linear range or at the min/max fluorescence value give it a special id
+      if(linearRange.includes(cycle.cycle)){
+        $(document.getElementById(well))
+          .append('<td class=linearRange >' + cycle.fluorescence + '</td>')
+      } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
+        $(document.getElementById(well))
+          .append('<td class=plateau >' + cycle.fluorescence + '</td>')
+      } else {
+        $(document.getElementById(well))
+          .append('<td>' + cycle.fluorescence + '</td>')
+      }
+    });
+  }
 }
 
+populateTable();
 
 var drawIndividualChart = function(element){
   var wellName = element.id;
