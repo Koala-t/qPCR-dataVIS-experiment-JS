@@ -7,19 +7,19 @@ var selectWell = function(wellName){
 // find the cycle where the Linear Phase starts
 var findLinearPhaseStart = function(wellName){
   var wellData = selectWell(wellName);
-  var firstCycleChange = wellData[1].fluorescence - wellData[0].fluorescence;
-  var secondCycleChange = wellData[2].fluorescence - wellData[1].fluorescence;
-
-  var previousCycleChange = firstCycleChange;
+  var previousCycleChange = wellData[1].fluorescence - wellData[0].fluorescence;
   var linearPhaseStartCycle = 0;
-  // iterate through the cycles
+  
+  // iterate through the cycles starting on cycleTwo
   for(var i = 1; i < wellData.length; i++){
     var currentCycleChange = wellData[i].fluorescence - wellData[i - 1].fluorescence
     
+    //update linearPhaseStartCycle to be the last cycle where there was in increase in delta fluorescence
     if(currentCycleChange > previousCycleChange){
       // this is not i+1 because I want the cycle before the last time this statement is true
       linearPhaseStartCycle = i;
     } else if(currentCycleChange < previousCycleChange){
+      // when the delta fluorescence starts dropping, return the linearPhaseStartCycle
       return linearPhaseStartCycle;
     }
     // update the previousCycleChange
