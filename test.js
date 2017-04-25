@@ -92,17 +92,28 @@ var overviewData = function(){
 
 
 // generate the overview table with jquery
+// add the well header
 $('#overviewTable').append('<th>Well</th>');
 
+// add the cycle headers
 for(var i = 1; i <= 40; i++){
   $('#overviewTable').append('<th>cycle: ' + i + '</th>');
 }
 
+// add the data
 for(var well in data){
+  var linearRange = linearPhaseRange(well);
   $('#overviewTable').append('<tr id=' + well + '></tr>');
   $(document.getElementById(well)).append('<td>' + well + '</td>');
   data[well].forEach(function(cycle){
-    $(document.getElementById(well)).append('<td>' + cycle.fluorescence + '</td>')
+    // if the cycle is in the linear range or at the max fluorescence value give it a special id
+    if(linearRange.includes(cycle.cycle)){
+      $(document.getElementById(well)).append('<td class=linearRange >' + cycle.fluorescence + '</td>')
+    } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
+      $(document.getElementById(well)).append('<td class=plateau >' + cycle.fluorescence + '</td>')
+    } else {
+      $(document.getElementById(well)).append('<td>' + cycle.fluorescence + '</td>')
+    }
   });
 }
 
