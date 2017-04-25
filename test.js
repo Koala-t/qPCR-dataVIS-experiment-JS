@@ -90,6 +90,23 @@ var overviewData = function(){
   return reformattedData;
 }
 
+//formatt the data for use in the solo chart
+var wellData = function(wellName){
+  var reformattedData = [];
+  var dataPoints = [];
+
+  data[wellName].forEach(function(cycle){
+    dataPoints.push({x: cycle.cycle, y: cycle.fluorescence});
+  });
+  reformattedData.push({
+    type: "line", 
+    toolTipContent: "{well}  cycle: {x}, fluorescence: {y}",
+    dataPoints: dataPoints
+  });  
+
+  return reformattedData;
+}
+
 
 // generate the overview table with jquery
 var addHeaders = function(){
@@ -117,21 +134,41 @@ for(var well in data){
   } 
   var linearRange = linearPhaseRange(well);
   $('#overviewTable').append('<tr id=' + well + '></tr>');
-  $(document.getElementById(well)).append('<td>' + well + '</td>');
+  // add the wellName value as a button linked to a chart-generating function
+  $(document.getElementById(well))
+    .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
+  
+
   data[well].forEach(function(cycle){
     // if the cycle is in the linear range or at the max fluorescence value give it a special id
     if(linearRange.includes(cycle.cycle)){
-      $(document.getElementById(well)).append('<td class=linearRange >' + cycle.fluorescence + '</td>')
+      $(document.getElementById(well))
+        .append('<td class=linearRange >' + cycle.fluorescence + '</td>')
     } else if(cycle.fluorescence >= 4999 || cycle.fluorescence === 0) {
-      $(document.getElementById(well)).append('<td class=plateau >' + cycle.fluorescence + '</td>')
+      $(document.getElementById(well))
+        .append('<td class=plateau >' + cycle.fluorescence + '</td>')
     } else {
-      $(document.getElementById(well)).append('<td>' + cycle.fluorescence + '</td>')
+      $(document.getElementById(well))
+        .append('<td>' + cycle.fluorescence + '</td>')
     }
   });
 }
 
 
+var drawIndividualChart = function(element){
+  var wellName = element.id;
 
+  var chart = new CanvasJS.Chart("soloChartContainer",
+  {
+    zoomEnabled: true,
+    title:{
+    text: "qPCR Solo Chart for " + wellName  
+    },
+    data: wellData(wellName)
+  });
+
+  chart.render();
+}
 
 
 
