@@ -174,26 +174,3 @@ var drawIndividualChart = function(element){
 
   chart.render();
 }
-
-
-
-
-
-// var table = d3.select('body').append('table');
-
-// for(var well in data){
-
-//   var tr = table.selectAll('tr')
-//       .data(data[well]).enter()
-//       .append('tr');
-
-//   tr.append('th')
-//       .attr('class', 'cycle')
-//       .html(function(m) { return "cycle: " + m.cycle; }); 
-
-   
-//   tr.append('td')
-//       .attr('class', 'fluorescence')
-//       .html(function(m) { return m.fluorescence; });
- 
-// }
