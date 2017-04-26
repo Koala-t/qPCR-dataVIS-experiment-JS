@@ -3,7 +3,6 @@ var selectWell = function(wellName){
   return data[wellName];
 };
 
-
 // find the cycle where the Linear Phase starts
 var findLinearPhaseStart = function(wellName){
   var wellData = selectWell(wellName);
@@ -71,7 +70,6 @@ var linearPhaseSlope = function(wellName){
   return phaseSlope + " unit increase in fluorescence per cycle"
 }
 
-
 //formatt the data for use in the solo chart
 var wellData = function(wellName){
   var dataPoints = [];
@@ -79,13 +77,13 @@ var wellData = function(wellName){
   data[wellName].forEach(function(cycle){
     dataPoints.push({x: cycle.cycle, y: cycle.fluorescence});
   });
-  var result = {
+  var formattedWellData = {
     type: "line", 
-    toolTipContent: "{well}  cycle: {x}, fluorescence: {y}",
+    toolTipContent: wellName + ", cycle: {x}, fluorescence: {y}",
     dataPoints: dataPoints
   };  
 
-  return result;
+  return formattedWellData;
 }
 
 //formatt the data for use in the overview chart
@@ -98,7 +96,6 @@ var overviewData = function(){
 
   return reformattedData;
 }
-
 
 // generate the overview table with jquery
 var addHeaders = function(){
@@ -129,6 +126,8 @@ var populateTable = function(){
     var linearRange = linearPhaseRange(well);
     $('#overviewTable').append('<tr id=' + well + '></tr>');
     // add the wellName value as a button linked to a chart-generating function
+      // come up with another way to get the well name to the onclick function
+      // it's bad to have two elements with the same id value (line 127 + 132)
     $(document.getElementById(well))
       .append('<td><button id=' + well + ' onclick="drawIndividualChart(this)">' + well + '</button></td>');
     
